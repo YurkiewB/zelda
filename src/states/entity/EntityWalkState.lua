@@ -27,6 +27,9 @@ function EntityWalkState:update(dt)
     -- assume we didn't hit a wall
     self.bumped = false
 
+    local oldX = self.entity.x
+    local oldY = self.entity.y
+
     -- boundary checking on all sides, allowing us to avoid collision detection on tiles
     if self.entity.direction == 'left' then
         self.entity.x = self.entity.x - self.entity.walkSpeed * dt
@@ -35,12 +38,35 @@ function EntityWalkState:update(dt)
             self.entity.x = MAP_RENDER_OFFSET_X + TILE_SIZE
             self.bumped = true
         end
+
+        if self.dungeon ~= nil then
+            local objects = self.dungeon.currentRoom.objects
+
+            for k, object in pairs(objects) do 
+                if object.solid and object.type == 'pot' and self.entity:collides(object) then
+                    self.entity.x = oldX
+                    self.bumped = true
+                end
+            end
+        end
+
     elseif self.entity.direction == 'right' then
         self.entity.x = self.entity.x + self.entity.walkSpeed * dt
 
         if self.entity.x + self.entity.width >= VIRTUAL_WIDTH - TILE_SIZE * 2 then
             self.entity.x = VIRTUAL_WIDTH - TILE_SIZE * 2 - self.entity.width
             self.bumped = true
+        end
+
+        if self.dungeon ~= nil then
+            local objects = self.dungeon.currentRoom.objects
+
+            for k, object in pairs(objects) do 
+                if object.solid and object.type == 'pot' and self.entity:collides(object) then
+                    self.entity.x = oldX
+                    self.bumped = true
+                end
+            end
         end
     elseif self.entity.direction == 'up' then
         self.entity.y = self.entity.y - self.entity.walkSpeed * dt
@@ -49,6 +75,19 @@ function EntityWalkState:update(dt)
             self.entity.y = MAP_RENDER_OFFSET_Y + TILE_SIZE - self.entity.height / 2
             self.bumped = true
         end
+
+        if self.dungeon ~= nil then
+            local objects = self.dungeon.currentRoom.objects
+
+            for k, object in pairs(objects) do 
+                if object.solid and object.type == 'pot' and self.entity:collides(object) then
+                    self.entity.y = oldY
+                    self.bumped = true
+                end
+            end
+        end
+
+
     elseif self.entity.direction == 'down' then
         self.entity.y = self.entity.y + self.entity.walkSpeed * dt
 
@@ -58,6 +97,17 @@ function EntityWalkState:update(dt)
         if self.entity.y + self.entity.height >= bottomEdge then
             self.entity.y = bottomEdge - self.entity.height
             self.bumped = true
+        end
+
+        if self.dungeon ~= nil then
+            local objects = self.dungeon.currentRoom.objects
+
+            for k, object in pairs(objects) do 
+                if object.solid and object.type == 'pot' and self.entity:collides(object) then
+                    self.entity.y = oldY
+                    self.bumped = true
+                end
+            end
         end
     end
 end
@@ -77,7 +127,7 @@ function EntityWalkState:processAI(params, dt)
 
         -- chance to go idle
         if math.random(3) == 1 then
-            self.entity:changeState('idle')
+            self.entity:changeState('idle', self.dungeon)
         else
             self.moveDuration = math.random(5)
             self.entity.direction = directions[math.random(#directions)]

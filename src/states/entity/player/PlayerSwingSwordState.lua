@@ -66,13 +66,45 @@ function PlayerSwingSwordState:update(dt)
         if entity:collides(self.swordHitbox) then
             entity:damage(1)
             gSounds['hit-enemy']:play()
+            if entity.health == 0 then 
+                if math.random(1, 3) == 3 then
+                    local heart = GameObject(
+                    GAME_OBJECT_DEFS['heart'],
+                    entity.x,
+                    entity.y
+                )
+
+                -- collision with heart passes heart object
+                heart.onCollide = function(heart)
+                    gSounds['pickup']:play()
+
+                    for k, object in pairs(self.dungeon.currentRoom.objects) do
+                        if object == heart then
+                            table.remove(self.dungeon.currentRoom.objects, k)
+                        end
+                    end
+                
+                    if self.player.health + 2 <= 6 then
+                        self.player.health = self.player.health + 2
+                    else
+                        self.player.health = 6
+                    end
+                end
+
+                Timer.tween(0.1, {
+                    [heart] = {y = entity.y + 4}
+                })
+                table.insert(self.dungeon.currentRoom.objects, heart)
+                end 
+            end 
+
         end
     end
 
     -- if we've fully elapsed through one cycle of animation, change back to idle state
     if self.player.currentAnimation.timesPlayed > 0 then
         self.player.currentAnimation.timesPlayed = 0
-        self.player:changeState('idle')
+        self.player:changeState('idle', self.dungeon)
     end
 
     -- allow us to change into this state afresh if we swing within it, rapid swinging

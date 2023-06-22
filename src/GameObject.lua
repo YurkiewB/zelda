@@ -29,8 +29,21 @@ function GameObject:init(def, x, y)
     self.width = def.width
     self.height = def.height
 
+    --decides if collidable or not
+    self.collidable = def.collidable
+    self.consumable = def.consumable
+
     -- default empty collision callback
-    self.onCollide = function() end
+    self.onCollide = def.onCollide
+    
+    -- onConsume
+    self.onConsume = def.onConsume
+
+end
+
+function GameObject:collides(target)
+    return not (self.x + self.width < target.x or self.x > target.x + target.width or
+                self.y + self.height < target.y or self.y > target.y + target.height)
 end
 
 function GameObject:update(dt)
