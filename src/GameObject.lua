@@ -36,7 +36,7 @@ function GameObject:init(def, x, y)
     self.dy = 0
     self.speed = 80
     self.distanceTraveled = 0
-    self.maxDistance = 4 * TILE_SIZE
+    self.maxDistance = 2 * TILE_SIZE
     self.thrown = false
     self.dungeon = nil
     self.player = nil
