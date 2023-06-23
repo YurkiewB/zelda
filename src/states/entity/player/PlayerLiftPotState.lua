@@ -3,6 +3,7 @@
     github: YurkiewB
 ]]
 
+local pot = nil
 
 PlayerLiftPotState = Class{__includes = BaseState}
 
@@ -23,7 +24,7 @@ function PlayerLiftPotState:enter(params)
     if params ~= nil then 
         gSounds['pot-lift']:play()
 
-        local pot = params.pot
+        pot = params.pot
         pot.solid = false
 
         self.player.currentAnimation:refresh()
@@ -41,7 +42,7 @@ end
 function PlayerLiftPotState:update(dt)
     if self.player.currentAnimation.timesPlayed > 0 then
         self.player.currentAnimation.timesPlayed = 0
-        self.player:changeState('pot-walk', self.dungeon)
+        self.player:changeState('pot-idle', {pot = pot, dungeon = self.dungeon})
     end
 end
 
@@ -61,4 +62,7 @@ function PlayerLiftPotState:render()
     -- love.graphics.rectangle('line', self.swordHurtbox.x, self.swordHurtbox.y,
     --     self.potHurtbox.width, self.potHurtbox.height)
     -- love.graphics.setColor(255, 255, 255, 255)
+    
+
+
 end

@@ -31,6 +31,7 @@ require 'src/states/entity/player/PlayerIdleState'
 require 'src/states/entity/player/PlayerSwingSwordState'
 require 'src/states/entity/player/PlayerWalkState'
 require 'src/states/entity/player/PlayerLiftPotState'
+require 'src/states/entity/player/PlayerIdlePotState'
 require 'src/states/entity/player/PlayerWalkPotState'
 
 require 'src/states/game/GameOverState'

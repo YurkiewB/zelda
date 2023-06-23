@@ -1,4 +1,4 @@
-PlayerWalkPotState = Class{__includes = BaseState}
+PlayerWalkPotState = Class{__includes = EntityWalkState}
 
 function PlayerWalkPotState:init(player, dungeon)
     self.entity = player
@@ -10,10 +10,13 @@ function PlayerWalkPotState:init(player, dungeon)
     self.player.offsetY = 5
     self.player.offsetX = 0
 
+    self.player:changeAnimation('pot-walk-' .. self.player.direction)
+
 end
 
 function PlayerWalkPotState:enter(params)
     self.player.currentAnimation:refresh()
+    self.pot = params.pot
 end
 
 
@@ -32,111 +35,31 @@ function PlayerWalkPotState:update(dt)
         self.player.direction = 'down'
         self.player:changeAnimation('pot-walk-down')
     else
-        if self.player.direction == 'left' then
-            self.player:changeAnimation('pot-walk-left-idle')
+        self.player:changeState('pot-idle', {pot = self.pot, dungeon = self.dungeon})
+    end
+
+    if love.keyboard.wasPressed('return') then
+        local potX, potY = self.player.x, self.player.y + 16
         
-        elseif self.player.direction == 'right' then
-            self.player:changeAnimation('pot-walk-right-idle')
-        elseif self.player.direction == 'down' then
-            self.player:changeAnimation('pot-walk-down-idle')
-        elseif self.player.direction == 'up' then
-            self.player:changeAnimation('pot-walk-up-idle')
-        end
+        Timer.tween(0.01, {
+            [self.pot] = {x = potX, y = potY}
+        })
+        self.entity:changeState('idle', self.dungeon)
     end
 
     -- perform base collision detection against walls
     EntityWalkState.update(self, dt)
 
-    if self.bumped then
+    local pot = self.pot
+    if pot ~= nil then 
 
-        if self.entity.direction == 'left' then
-            
-            -- temporarily adjust position into the wall, since bumping pushes outward
-            self.entity.x = self.entity.x - PLAYER_WALK_SPEED * dt
-            
-            -- check for colliding into doorway to transition
-            for k, doorway in pairs(self.dungeon.currentRoom.doorways) do
-                if self.entity:collides(doorway) and doorway.open then
+        local potX, potY = self.player.x, self.player.y - 12
 
-                    -- shift entity to center of door to avoid phasing through wall
-                    self.entity.y = doorway.y + 4
-                    Event.dispatch('shift-left')
-                end
-            end
-
-
-            -- readjust
-            self.entity.x = self.entity.x + PLAYER_WALK_SPEED * dt
-        elseif self.entity.direction == 'right' then
-            
-            -- temporarily adjust position
-            self.entity.x = self.entity.x + PLAYER_WALK_SPEED * dt
-            
-            -- check for colliding into doorway to transition
-            for k, doorway in pairs(self.dungeon.currentRoom.doorways) do
-                if self.entity:collides(doorway) and doorway.open then
-
-                    -- shift entity to center of door to avoid phasing through wall
-                    self.entity.y = doorway.y + 4
-                    Event.dispatch('shift-right')
-                end
-            end
-
-
-            -- readjust
-            self.entity.x = self.entity.x - PLAYER_WALK_SPEED * dt
-        elseif self.entity.direction == 'up' then
-            
-            -- temporarily adjust position
-            self.entity.y = self.entity.y - PLAYER_WALK_SPEED * dt
-            
-            -- check for colliding into doorway to transition
-            for k, doorway in pairs(self.dungeon.currentRoom.doorways) do
-                if self.entity:collides(doorway) and doorway.open then
-
-                    -- shift entity to center of door to avoid phasing through wall
-                    self.entity.x = doorway.x + 8
-                    Event.dispatch('shift-up')
-                end
-            end
-
-            -- readjust
-            self.entity.y = self.entity.y + PLAYER_WALK_SPEED * dt
-        else
-            
-            -- temporarily adjust position
-            self.entity.y = self.entity.y + PLAYER_WALK_SPEED * dt
-            
-            -- check for colliding into doorway to transition
-            for k, doorway in pairs(self.dungeon.currentRoom.doorways) do
-                if self.entity:collides(doorway) and doorway.open then
-
-                    -- shift entity to center of door to avoid phasing through wall
-                    self.entity.x = doorway.x + 8
-                    Event.dispatch('shift-down')
-                end
-            end
-
-            -- readjust
-            self.entity.y = self.entity.y - PLAYER_WALK_SPEED * dt
-        end
-    end
-
-    if self.player.currentAnimation.timesPlayed > 0 then
-        self.player.currentAnimation.timesPlayed = 0
-        if self.player.direction == 'left' then
-            self.player:changeAnimation('pot-walk-left-idle')
-        elseif self.player.direction == 'right' then
-            self.player:changeAnimation('pot-walk-right-idle')
-        elseif self.player.direction == 'down' then
-            self.player:changeAnimation('pot-walk-down-idle')
-        elseif self.player.direction == 'up' then
-            self.player:changeAnimation('pot-walk-up-idle')
-        end
+        Timer.tween(0.01, {
+            [pot] = {x = potX, y = potY}
+        })
     end
 end
-
-
 
 function PlayerWalkPotState:render()
     local anim = self.player.currentAnimation
