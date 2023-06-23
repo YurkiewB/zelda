@@ -1,3 +1,8 @@
+--[[
+    Author: Brandon Yurkiewicz
+    GitHub: YurkiewB
+]]
+
 PlayerWalkPotState = Class{__includes = EntityWalkState}
 
 function PlayerWalkPotState:init(player, dungeon)
