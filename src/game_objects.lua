@@ -49,6 +49,7 @@ GAME_OBJECT_DEFS = {
         width = 16,
         solid = true,
         collidable = true,
+        projectile = true,
         defaultState = 'unbroken',
         states = {
             ['unbroken'] = {

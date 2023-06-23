@@ -39,11 +39,7 @@ function PlayerWalkPotState:update(dt)
     end
 
     if love.keyboard.wasPressed('return') then
-        local potX, potY = self.player.x, self.player.y + 16
-        
-        Timer.tween(0.01, {
-            [self.pot] = {x = potX, y = potY}
-        })
+        self.pot:fire(self.player, self.dungeon)
         self.entity:changeState('idle', self.dungeon)
     end
 

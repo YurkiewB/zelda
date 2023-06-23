@@ -27,22 +27,14 @@ function PlayerIdlePotState:update(dt)
     end
 
     if love.keyboard.wasPressed('return') then
-        local potX, potY = self.player.x, self.player.y + 16
-        
-        Timer.tween(0.01, {
-            [self.pot] = {x = potX, y = potY}
-        })
+        self.pot:fire(self.player, self.dungeon)
         self.entity:changeState('idle', self.dungeon)
-    end
 
-    local pot = self.pot
-    if pot ~= nil then 
-        local potX, potY = self.player.x, self.player.y - 12
+        -- local potX, potY = self.player.x, self.player.y + 16
         
-        Timer.tween(0.01, {
-            [pot] = {x = potX, y = potY}
-        })
-
+        -- Timer.tween(0.01, {
+        --     [self.pot] = {x = potX, y = potY}
+        -- })
     end
 
 end
